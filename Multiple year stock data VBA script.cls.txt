@@ -1,0 +1,114 @@
+Sub WorksheetLoop()
+
+Dim ws As Worksheet
+
+    For Each ws In Worksheets
+    
+    'set variables for stock analysis
+    Dim TickerName As String
+    Dim TotalVolume As Double
+    Dim Summary As Integer
+    Dim LastRow As Double
+    Dim YearlyChange As Double
+    Dim PercentageChange As Double
+    Dim OpenPrice As Double
+    Dim ClosePrice As Double
+    
+    'Set variables for finding greatest % increase and decrease and total volume
+    Dim MaxValue As Double
+    Dim MinValue As Double
+    Dim TotalValue As Double
+    Dim LastRow2 As Double
+    Dim Ticker_Name As String
+    
+    'Adding Column names to all worksheets
+    ws.Cells(1, 9).Value = "Ticker"
+    ws.Cells(1, 10).Value = "Yearly Change"
+    ws.Cells(1, 11).Value = "Percentage Change"
+    ws.Cells(1, 12).Value = "Total Volume"
+    ws.Cells(2, 15).Value = "Greatest % Increase"
+    ws.Cells(3, 15).Value = "Greatest % Decrease"
+    ws.Cells(4, 15).Value = "Greatest Total Volume"
+    ws.Cells(1, 16).Value = "Ticker"
+    ws.Cells(1, 17).Value = "Value"
+    
+    'Autofit new columns
+    Range("I1").EntireColumn.AutoFit
+    Range("J1").EntireColumn.AutoFit
+    Range("K1").EntireColumn.AutoFit
+    Range("L1").EntireColumn.AutoFit
+    Range("O1").EntireColumn.AutoFit
+    Range("P1").EntireColumn.AutoFit
+    Range("Q1").EntireColumn.AutoFit
+    
+        LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+        Summary = 2
+            'MsgBox (lastrow)
+            
+            'Sort data by ticker name, capture total stock volume and yearly change
+            For i = 2 To LastRow
+            
+                If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+                
+                    'Setting TickerName
+                    TickerName = ws.Cells(i, 1).Value
+                    TotalVolume = TotalVolume + ws.Cells(i, 7).Value
+                    'Placing new values in columns TickerName and TotalVolume
+                    Range("I" & Summary).Value = TickerName
+                    Range("L" & Summary).Value = TotalVolume
+                    
+                    'Calculating yearly change
+                    ClosePrice = ws.Cells(i, 6).Value
+                    YearlyChange = ClosePrice - OpenPrice
+                    ws.Cells(Summary, 10).Value = YearlyChange
+                                        
+                    'Conditional Formatting ws.Cells for yearly & percentage change
+                    If YearlyChange < 0 Then
+                        ws.Cells(Summary, 10).Interior.ColorIndex = 3
+                        ws.Cells(Summary, 11).Interior.ColorIndex = 3
+                            
+                    ElseIf YearlyChange > 0 Then
+                        ws.Cells(Summary, 10).Interior.ColorIndex = 4
+                        ws.Cells(Summary, 11).Interior.ColorIndex = 4
+                            
+                    End If
+                    
+                    'Setting parameter for if value = 0
+                    If YearlyChange = 0 Or OpenPrice = 0 Then
+                        ws.Cells(Summary, 12).Value = 0
+                           
+                    'Calculating percentage change
+                    Else
+                        ws.Cells(Summary, 11).Value = Format(YearlyChange / OpenPrice) * 100
+                    
+                    End If
+                    
+                    'Resetting loop
+                    Summary = Summary + 1
+                    TotalVolume = 0
+            
+                    'Finding Greatest Increase %
+                    'If ws.Cells(i + 1, 11).Value <> ws.Cells(i, 11).Value Then
+                
+                            'Ticker_Name = ws.Cells(i, 9).Value
+                            'MaxValue = WorksheetFunction.Max("K")
+                            'ws.Cells(2, 16).Value = Ticker_Name
+                            'ws.Cells(2, 17).Value = MaxValue
+                        
+                    'End If
+                    
+                ElseIf ws.Cells(i, 1).Value <> ws.Cells(i - 1, 1).Value Then
+                    OpenPrice = ws.Cells(i, 3).Value
+                
+                Else
+                    TotalVolume = TotalVolume + ws.Cells(i, 7).Value
+                        ws.Cells(Summary, 12).Value = TotalVolume
+                        
+                End If
+                         
+            Next i
+            
+        Next ws
+    
+End Sub
+
